@@ -131,7 +131,7 @@ fun HomeScreen(
             }
 
             items(SupportedSites.all) { site ->
-                Card(Modifier.fillMaxWidth(), onClick = {
+                Card(modifier = Modifier.fillMaxWidth(), onClick = {
                     input = "https://${site.host}/"
                 }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
