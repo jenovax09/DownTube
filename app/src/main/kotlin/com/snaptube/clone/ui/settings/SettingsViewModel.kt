@@ -28,7 +28,7 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
 
     private val settings: SettingsRepository = container.settingsRepository
 
-    private val _message = MutableStateFlow<String?>()
+    private val _message = MutableStateFlow<String?>(null)
 
     /** One-shot user feedback (e.g. "cleared"). */
     val message: StateFlow<String?> = _message
