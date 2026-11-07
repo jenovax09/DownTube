@@ -122,7 +122,7 @@ private fun DownloadsList(
         if (active.isNotEmpty()) item { Text("Downloading", style = MaterialTheme.typography.titleSmall) }
         items(active) { task ->
             val p = progress[task.id]
-            Card(modifier = Modifier.fillMaxWidth(), onClick = { onPlay(media) }) {
+            Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp)) {
                     Text(task.title, style = MaterialTheme.typography.bodyLarge, maxLines = 1)
                     val downloaded = p?.downloadedBytes ?: task.downloadedBytes
@@ -218,7 +218,7 @@ private fun LocalList(items: List<LocalMedia>, onPlay: (LocalMedia) -> Unit) {
     }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(items) { media ->
-            Card(Modifier.fillMaxWidth(), onClick = { onPlay(media) }) {
+            Card(modifier = Modifier.fillMaxWidth(), onClick = { onPlay(media) }) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Spacer(Modifier.size(12.dp))
