@@ -13,6 +13,7 @@ import com.snaptube.clone.core.model.SearchPage
 import com.snaptube.clone.core.model.SubtitleTrack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
@@ -47,7 +48,7 @@ class YouTubeExtractor(
             val videoId = videoId(url) ?: throw ExtractionError("Not a recognised YouTube URL")
 
             var player = client.player(videoId)
-            if (formatsOf(player).isEmpty() && adaptiveOf(player).isEmpty()) {
+            if (formatsOf(player).isNullOrEmpty() && adaptiveOf(player).isNullOrEmpty()) {
                 player = client.webPlayer(videoId)
             }
             if (playabilityBlocked(player)) {
