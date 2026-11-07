@@ -17,8 +17,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-enum class LibraryTab(val label: String) { DOWNLOADS, HISTORY, VIDEOS, AUDIO }
-
+enum class LibraryTab(val label: String) { DOWNLOADS("Downloads"), HISTORY("History"), VIDEOS("Videos"), AUDIO("Audio") }
 data class LibraryUiState(
     val tab: LibraryTab = LibraryTab.DOWNLOADS,
     val localVideos: List<LocalMedia> = emptyList(),
