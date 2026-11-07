@@ -122,7 +122,7 @@ private fun DownloadsList(
         if (active.isNotEmpty()) item { Text("Downloading", style = MaterialTheme.typography.titleSmall) }
         items(active) { task ->
             val p = progress[task.id]
-            Card(Modifier.fillMaxWidth()) {
+            Card(modifier = Modifier.fillMaxWidth(), onClick = { onPlay(media) }) {
                 Column(Modifier.padding(16.dp)) {
                     Text(task.title, style = MaterialTheme.typography.bodyLarge, maxLines = 1)
                     val downloaded = p?.downloadedBytes ?: task.downloadedBytes
