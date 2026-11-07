@@ -33,12 +33,16 @@ class MediaMuxer(private val context: Context) {
         withContext(Dispatchers.IO) {
             if (outputFile.exists()) outputFile.delete()
 
-            val videoItem = EditedMediaItem.Builder(MediaItem.fromUri(videoFile.toURI().toString())).build()
-            val audioItem = EditedMediaItem.Builder(MediaItem.fromUri(audioFile.toURI().toString())).build()
-            val sequence = EditedMediaItemSequence.Builder(videoItem)
-                .addItem(audioItem)
+            val videoItem = EditedMediaItem.Builder(MediaItem.fromUri(videoFile.toURI().toString()))
+                .setRemoveAudio(true)
                 .build()
-            val composition = Composition.Builder(sequence).build()
+            val audioItem = EditedMediaItem.Builder(MediaItem.fromUri(audioFile.toURI().toString()))
+                .setRemoveVideo(true)
+                .build()
+            val composition = Composition.Builder(
+                EditedMediaItemSequence(videoItem),
+                EditedMediaItemSequence(audioItem)
+            ).build()
 
             runTransformer(Transformer.Builder(context).build(), composition, outputFile)
             outputFile
