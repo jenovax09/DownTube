@@ -4,9 +4,9 @@ import com.snaptube.clone.core.common.DispatcherProvider
 import com.snaptube.clone.core.common.DefaultDispatcherProvider
 import com.snaptube.clone.core.database.SnapTubeDatabase
 import com.snaptube.clone.core.database.entity.DownloadTaskEntity
-import com.snaptube.clone.core.database.mapper.Mappers.toDomain
-import com.snaptube.clone.core.database.mapper.Mappers.toEntity
-import com.snaptube.clone.core.database.mapper.Mappers.toHistoryEntity
+import com.snaptube.clone.core.database.mapper.toDomain
+import com.snaptube.clone.core.database.mapper.toEntity
+import com.snaptube.clone.core.database.mapper.toHistoryEntity
 import com.snaptube.clone.core.download.media.AudioConverter
 import com.snaptube.clone.core.download.media.MediaMuxer
 import com.snaptube.clone.core.download.media.NoOpAudioConverter
