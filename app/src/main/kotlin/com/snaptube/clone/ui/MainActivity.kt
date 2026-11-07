@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     /** Link shared into / opened with the app, consumed by the Home screen. */
-    private val incomingLink = MutableStateFlow<String?>()
+    private val incomingLink = MutableStateFlow<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
