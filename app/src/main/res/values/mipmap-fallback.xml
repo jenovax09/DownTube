@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fallback icons for pre-API-26 devices -->
+    <item name="ic_launcher" type="mipmap">@drawable/ic_launcher_foreground</item>
+    <item name="ic_launcher_round" type="mipmap">@drawable/ic_launcher_foreground</item>
+</resources>
