@@ -79,23 +79,69 @@ class InnerTubeClient(
 
     // ---------------------------------------------------------------------
 
-    private fun post(endpoint: String, body: JsonObject): JsonObject {
-        val request = Request.Builder()
-            .url("$BASE_URL/$endpoint?key=$API_KEY&prettyPrint=false")
-            .header("User-Agent", HttpClient.USER_AGENT)
-            .header("Content-Type", "application/json")
-            .header("X-Goog-Api-Format-Version", "1")
-            .header("Origin", "https://www.youtube.com")
-            .post(body.toString().toRequestBody("application/json".toMediaType()))
-            .build()
-        client.newCall(request).execute().use { response ->
-            val text = response.body?.string().orEmpty()
-            if (!response.isSuccessful) {
-                throw InnerTubeException("HTTP ${response.code} from $endpoint: ${text.take(200)}")
-            }
-            return json.parseToJsonElement(text).jsonObject
+    
+private fun post(endpoint: String, body: JsonObject): JsonObject {
+
+    val contextClient = body["context"]
+        ?.jsonObject
+        ?.get("client")
+        ?.jsonObject
+
+    val clientName = contextClient
+        ?.get("clientName")
+        ?.toString()
+        ?.trim('"')
+        ?: "WEB"
+
+    val clientVersion = contextClient
+        ?.get("clientVersion")
+        ?.toString()
+        ?.trim('"')
+        ?: "unknown"
+
+    val request = Request.Builder()
+        .url("$BASE_URL/$endpoint?key=$API_KEY&prettyPrint=false")
+        .header("User-Agent", HttpClient.USER_AGENT)
+        .header("Content-Type", "application/json")
+        .header("Accept", "application/json")
+        .header("Origin", "https://www.youtube.com")
+        .header("Referer", "https://www.youtube.com/")
+        .header("X-YouTube-Client-Name", clientName)
+        .header("X-YouTube-Client-Version", clientVersion)
+        .post(
+            body.toString().toRequestBody(
+                "application/json".toMediaType()
+            )
+        )
+        .build()
+
+    client.newCall(request).execute().use { response ->
+
+        val responseText = response.body?.string().orEmpty()
+
+        if (!response.isSuccessful) {
+            throw InnerTubeException(
+                """
+                YouTube API request failed.
+                Endpoint: $endpoint
+                HTTP: ${response.code}
+                Client: $clientName
+                Version: $clientVersion
+                Response: ${responseText.take(1000)}
+                """.trimIndent()
+            )
+        }
+
+        return try {
+            json.parseToJsonElement(responseText).jsonObject
+        } catch (e: Exception) {
+            throw InnerTubeException(
+                "Invalid YouTube JSON response: ${e.message}"
+            )
         }
     }
+}
+
 
     private fun buildClient(name: String, version: String, sdk: String?): JsonObject = buildJsonObject {
         put("clientName", name)
