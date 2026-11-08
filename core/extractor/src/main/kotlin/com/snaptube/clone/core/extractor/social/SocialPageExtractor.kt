@@ -45,8 +45,8 @@ abstract class SocialPageExtractor : MediaExtractor {
 
             val title = findTitle(payload, html).ifEmpty { "$name video" }
             val thumbnail = findThumbnail(payload, html)
-            val durationMs = findDurationMs(payload)
-            val author = findAuthor(payload)
+            val durationMs = findDurationMs(payload, html)
+            val author = findAuthor(payload, html)
 
             val format = DownloadFormat(
                 id = "MP4_${name.uppercase()}",
@@ -117,9 +117,15 @@ abstract class SocialPageExtractor : MediaExtractor {
     protected open fun findThumbnail(payload: JsonArray?, html: String): String =
         meta(html, "og:image") ?: meta(html, "twitter:image") ?: ""
 
-    protected open fun findAuthor(payload: JsonArray?): String = ""
+    protected open fun findAuthor(
+    payload: JsonArray?,
+    html: String
+): String = ""
 
-    protected open fun findDurationMs(payload: JsonArray?): Long = 0L
+protected open fun findDurationMs(
+    payload: JsonArray?,
+    html: String
+): Long = 0L
 
     protected fun meta(html: String, property: String): String? {
         val regex = Regex(
