@@ -2,30 +2,50 @@ package com.snaptube.clone.core.extractor.social
 
 import kotlinx.serialization.json.JsonArray
 
-/**
- * Twitter/X public videos. Reads the "variants" array of the public
- * tweet JSON, preferring the highest-bitrate MP4.
- */
 class TwitterExtractor : SocialPageExtractor() {
 
-    override val name: String = "twitter"
+    override val name = "twitter"
 
-    override fun canHandle(url: String): Boolean =
-        url.contains("twitter.com/") || url.contains("//x.com/")
+    override fun canHandle(url: String): Boolean {
+        return runCatching {
+            val host = java.net.URI(url).host?.lowercase() ?: return false
 
-    override fun findVideoUrl(payload: JsonArray?, html: String): String? {
-        val variants = Regex(""""variants"\s*:\s*\[(.*?)]""", RegexOption.DOT_MATCHES_ALL)
-            .find(html)?.groupValues?.get(1) ?: return ogVideo(html)
-        val mp4s = Regex("""https?:[^"]+\.mp4""").findAll(variants).map { it.value }.toList()
-        if (mp4s.isEmpty()) return ogVideo(html)
-        // Highest bitrate is usually last because Twitter orders variants ascending.
-        return unescape(mp4s.last())
+            host == "x.com" ||
+                host.endsWith(".x.com") ||
+                host == "twitter.com" ||
+                host.endsWith(".twitter.com")
+        }.getOrDefault(false)
     }
 
-    private fun ogVideo(html: String): String? =
-        Regex("""<meta[^>]+property=["']og:video(?::url)?["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
-            .find(html)?.let { unescape(it.groupValues[1]) }
+    override fun findVideoUrl(
+        payload: JsonArray?,
+        html: String
+    ): String? {
 
-    override fun findTitle(payload: JsonArray?, html: String): String =
+        val variants = Regex(
+            """"variants"\s*:\s*\[(.*?)]""",
+            RegexOption.DOT_MATCHES_ALL
+        ).find(html)?.groupValues?.get(1)
+
+        if (variants != null) {
+            val mp4s = Regex(
+                """"url"\s*:\s*"([^"]+\.mp4[^"]*)""""
+            ).findAll(variants)
+                .map { unescape(it.groupValues[1]) }
+                .toList()
+
+            if (mp4s.isNotEmpty()) {
+                return mp4s.last()
+            }
+        }
+
+        return meta(html, "og:video")
+            ?: meta(html, "og:video:url")
+    }
+
+    override fun findTitle(
+        payload: JsonArray?,
+        html: String
+    ): String =
         meta(html, "og:title") ?: "X video"
 }
