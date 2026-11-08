@@ -47,10 +47,37 @@ class YouTubeExtractor(
         runCatchingResult {
             val videoId = videoId(url) ?: throw ExtractionError("Not a recognised YouTube URL")
 
-            var player = client.player(videoId)
-            if (formatsOf(player).isNullOrEmpty() && adaptiveOf(player).isNullOrEmpty()) {
-                player = client.webPlayer(videoId)
+            val androidResult = runCatching {
+    client.player(videoId)
+}
+
+val androidPlayer = androidResult.getOrNull()
+
+val player = if (
+    androidPlayer != null &&
+    (
+        !formatsOf(androidPlayer).isNullOrEmpty() ||
+        !adaptiveOf(androidPlayer).isNullOrEmpty()
+    )
+) {
+    androidPlayer
+} else {
+    val webResult = runCatching {
+        client.webPlayer(videoId)
+    }
+
+    webResult.getOrElse { error ->
+        throw ExtractionError(
+            buildString {
+                append("YouTube extraction failed.")
+                append("\nAndroid: ")
+                append(androidResult.exceptionOrNull()?.message ?: "No formats returned")
+                append("\nWeb: ")
+                append(error.message ?: "Unknown error")
             }
+        )
+    }
+}
             if (playabilityBlocked(player)) {
                 return@runCatchingResult restricted(player)
             }
