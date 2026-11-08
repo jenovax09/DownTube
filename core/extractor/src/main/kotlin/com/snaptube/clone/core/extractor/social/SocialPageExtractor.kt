@@ -41,7 +41,20 @@ abstract class SocialPageExtractor : MediaExtractor {
             val html = fetch(target)
             val payload = extractPayload(html)
             val videoUrl = findVideoUrl(payload, html)
-                ?: throw IllegalStateException("No public video stream found for this $name link")
+                ?: throw IllegalStateException(
+    """
+    Unable to extract $name video.
+
+    Possible reasons:
+    - The platform did not provide public video metadata.
+    - The link requires authentication.
+    - The video is private or restricted.
+    - The platform changed its page structure.
+    - The request was rate limited.
+
+    Please try another publicly accessible link.
+    """.trimIndent()
+)
 
             val title = findTitle(payload, html).ifEmpty { "$name video" }
             val thumbnail = findThumbnail(payload, html)
